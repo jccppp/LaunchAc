@@ -1,4 +1,4 @@
-package com.jccppp.start_up
+package com.jccppp.start
 
 import org.junit.Test
 

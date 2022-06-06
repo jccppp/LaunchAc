@@ -1,4 +1,4 @@
-package com.jccppp.start_up
+package com.jccppp.start
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

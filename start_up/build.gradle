@@ -7,7 +7,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.jccppp.start_up"
+        applicationId "com.jccppp.start"
         minSdk 21
         targetSdk 32
         versionCode 1
