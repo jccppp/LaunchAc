@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.jccppp.start.jk.ConditionalJumpLogin
 import com.jccppp.start.jk.IAcCallBack
+import com.jccppp.start.jk.IOnLoginNext
 import com.jccppp.start.jk.StartForResult
 
 
@@ -13,7 +14,7 @@ import com.jccppp.start.jk.StartForResult
  * */
 inline fun <reified AC : FragmentActivity> FragmentActivity.launchActivityWithLogin(
     noinline next: ((Boolean) -> Unit)? = null,  //后续操作
-    noinline intent: (Intent.() -> Unit)? = null,
+    noinline intent: ((Intent) -> Unit)? = null,
 ) {
 
     val jump: ConditionalJumpLogin? = if (next == null) null else object : ConditionalJumpLogin {
@@ -33,7 +34,7 @@ inline fun <reified AC : FragmentActivity> FragmentActivity.launchActivityWithLo
 inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivityWithLoginForResult(
     acBack: StartForResult,
     noinline next: ((Boolean) -> Unit)? = null,  //后续操作
-    noinline intent: (Intent.() -> Unit)? = null,
+    noinline intent: ((Intent) -> Unit)? = null,
 ) {
 
     val jump: ConditionalJumpLogin? = if (next == null) null else object : ConditionalJumpLogin {
@@ -55,7 +56,7 @@ inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivityWithLoginFo
  * */
 inline fun <reified AC : FragmentActivity> FragmentActivity.launchActivityWithLoginForBack(
     jump: ConditionalJumpLogin? = null,  //后续操作,true 为登录成功，false为登录失败
-    noinline intent: (Intent.() -> Unit)? = null,
+    noinline intent: ((Intent) -> Unit)? = null,
 ) {
 
     insideStartUpActivityWithLoginForResult<AC>(null, jump, intent)
@@ -64,7 +65,7 @@ inline fun <reified AC : FragmentActivity> FragmentActivity.launchActivityWithLo
 
 inline fun <reified AC : FragmentActivity> Fragment.launchActivityWithLoginForBack(
     jump: ConditionalJumpLogin? = null,  //后续操作,true 为登录成功，false为登录失败
-    noinline intent: (Intent.() -> Unit)? = null,
+    noinline intent: ((Intent) -> Unit)? = null,
 ) {
 
     activity?.launchActivityWithLoginForBack<AC>(jump, intent)
@@ -76,10 +77,10 @@ inline fun <reified AC : FragmentActivity> Fragment.launchActivityWithLoginForBa
 inline fun <reified AC : FragmentActivity> FragmentActivity.insideStartUpActivityWithLoginForResult(
     acb: IAcCallBack? = null,
     jump: ConditionalJumpLogin? = null,  //后续操作,true 为登录成功，false为登录失败
-    noinline intent: (Intent.() -> Unit)? = null,
+    noinline intent: ((Intent) -> Unit)? = null,
 ) {
 
-    if (true) {
+    if (LaunchUtil.getIsLogin()) {
         if (jump?.jump(true) != false) {
             if (acb == null) {
                 launchActivity<AC>(intent)
@@ -89,14 +90,19 @@ inline fun <reified AC : FragmentActivity> FragmentActivity.insideStartUpActivit
         }
 
     } else {
-        if (jump?.jump(true) != false) {
-            if (acb == null) {
-                launchActivity<AC>(intent)
-            } else {
-                acb.launchActivity<AC>(intent = intent)
+        LaunchUtil.getStartLogin(this, object : IOnLoginNext {
+            override fun isLogin(login: Boolean) {
+                if (login) {
+                    if (jump?.jump(login) != false) {
+                        if (acb == null) {
+                            launchActivity<AC>(intent)
+                        } else {
+                            acb.launchActivity<AC>(intent = intent)
+                        }
+                    }
+                }
             }
-        }
-
+        })
     }
 }
 
@@ -104,7 +110,7 @@ inline fun <reified AC : FragmentActivity> FragmentActivity.insideStartUpActivit
 inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivityWithLoginForResultBack(
     acBack: StartForResult,
     jump: ConditionalJumpLogin? = null,  //后续操作,true 为登录成功，false为登录失败
-    noinline intent: (Intent.() -> Unit)? = null,
+    noinline intent: ((Intent) -> Unit)? = null,
 ) {
     getResultDeque().offerFirst(acBack)
     getAcCallContext()?.insideStartUpActivityWithLoginForResult<AC>(
@@ -114,14 +120,14 @@ inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivityWithLoginFo
 
 inline fun <reified AC : FragmentActivity> Fragment.launchActivityWithLogin(
     noinline next: ((Boolean) -> Unit)? = null,  //后续操作,true 为登录成功，false为登录失败
-    noinline intent: (Intent.() -> Unit)? = null,
+    noinline intent: ((Intent) -> Unit)? = null,
 ) {
     activity?.launchActivityWithLogin<AC>(next, intent)
 }
 
 
 inline fun <reified AC : FragmentActivity> FragmentActivity.launchActivity(
-    noinline intent: (Intent.() -> Unit)? = null
+    noinline intent: ((Intent) -> Unit)? = null
 ) {
     startActivity(Intent(this, AC::class.java).also {
         intent?.invoke(it)
@@ -129,7 +135,7 @@ inline fun <reified AC : FragmentActivity> FragmentActivity.launchActivity(
 }
 
 inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivity(
-    noinline intent: (Intent.() -> Unit)? = null
+    noinline intent: ((Intent) -> Unit)? = null
 ) {
     getAcCallContext()?.let { it ->
         getResultLauncher().launch(Intent(it, AC::class.java).also {
@@ -142,7 +148,7 @@ inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivity(
 
 inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivityForResult(
     acBack: StartForResult,
-    noinline intent: (Intent.() -> Unit)? = null
+    noinline intent: ((Intent) -> Unit)? = null
 ) {
     getResultDeque().offerFirst(acBack)
     getAcCallContext()?.let {
@@ -152,7 +158,7 @@ inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivityForResult(
 }
 
 inline fun <reified AC : FragmentActivity> Fragment.launchActivity(
-    noinline intent: (Intent.() -> Unit)? = null
+    noinline intent: ((Intent) -> Unit)? = null
 ) {
     activity?.launchActivity<AC>(intent)
 }
