@@ -17,6 +17,7 @@ class LoginActivity : AppCompatActivity()  {
         findViewById<View>(R.id.view).setOnClickListener {
             isLogin = true
             setResult(RESULT_OK)
+            finish()
         }
     }
 }
