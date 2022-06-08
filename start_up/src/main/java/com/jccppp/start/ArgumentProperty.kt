@@ -53,17 +53,17 @@ class FragmentArgumentProperty<T>(
 class FragmentArgumentPropertyNullable<T>(private val setKey: String?) :
     ReadWriteProperty<Fragment, T?> {
 
-    var setUp = false
 
     var value: T? = null
 
     override fun getValue(thisRef: Fragment, property: KProperty<*>): T? {
-        if (setUp) return value
-        return thisRef.arguments?.getValue(setKey ?: property.name)
+        if (value != null) return value
+        val value1 = thisRef.arguments?.getValue<T>(setKey ?: property.name)
+        value = value1
+        return value
     }
 
     override fun setValue(thisRef: Fragment, property: KProperty<*>, value: T?) {
-        if (!setUp) setUp = true
         this.value = value
     }
 }
@@ -91,17 +91,16 @@ class ActivityArgumentProperty<T>(private val defaultValue: T?, private val setK
 class ActivityArgumentDelegateNullable<T>(private val setKey: String?) :
     ReadWriteProperty<Activity, T?> {
 
-    var setUp = false
-
     var value: T? = null
 
     override fun getValue(thisRef: Activity, property: KProperty<*>): T? {
-        if (setUp) return value
-        return thisRef.intent?.extras?.getValue(setKey ?: property.name)
+        if (value != null) return value
+        val value1 = thisRef.intent?.extras?.getValue<T>(setKey ?: property.name)
+        value = value1
+        return value
     }
 
     override fun setValue(thisRef: Activity, property: KProperty<*>, value: T?) {
-        if (!setUp) setUp = true
         this.value = value
     }
 }
