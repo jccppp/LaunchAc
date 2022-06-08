@@ -85,7 +85,7 @@ inline fun <reified AC : FragmentActivity> FragmentActivity.insideStartUpActivit
             if (acb == null) {
                 launchActivity<AC>(intent)
             } else {
-                acb.getAcCallContext()?.launchActivity<AC>(intent = intent)
+                acb._launchActivity<AC>(intent = intent)
             }
         }
 
@@ -97,7 +97,7 @@ inline fun <reified AC : FragmentActivity> FragmentActivity.insideStartUpActivit
                         if (acb == null) {
                             launchActivity<AC>(intent)
                         } else {
-                            acb.getAcCallContext()?.launchActivity<AC>(intent = intent)
+                            acb._launchActivity<AC>(intent = intent)
                         }
                     }
                 }
@@ -134,6 +134,16 @@ inline fun <reified AC : FragmentActivity> FragmentActivity.launchActivity(
     })
 }
 
+inline fun <reified AC : FragmentActivity> IAcCallBack._launchActivity(
+    noinline intent: ((Intent) -> Unit)? = null
+) {
+    getAcCallContext()?.let { it ->
+        getResultLauncher().launch(Intent(it, AC::class.java).also {
+            intent?.invoke(it)
+        })
+    }
+
+}
 
 
 inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivityForResult(
@@ -141,9 +151,7 @@ inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivityForResult(
     noinline intent: ((Intent) -> Unit)? = null
 ) {
     getResultDeque().offerFirst(acBack)
-    getAcCallContext()?.let {
-        it.launchActivity<AC>(intent = intent)
-    }
+    _launchActivity<AC>(intent = intent)
 
 }
 
