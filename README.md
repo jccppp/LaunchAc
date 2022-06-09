@@ -1,6 +1,6 @@
 请添加 maven { url 'https://jitpack.io' }
 
-implementation 'com.github.jccppp:launchac:0.0.3'
+implementation 'com.github.jccppp:launchac:0.0.5'
 
 开始使用
 
