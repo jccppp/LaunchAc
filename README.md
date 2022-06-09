@@ -10,9 +10,8 @@ implementation 'com.github.jccppp:launchac:0.0.3'
 <img width="446" alt="image" src="https://user-images.githubusercontent.com/28549918/172647110-8d5354f6-283e-4f04-bbfa-47c939606826.png">
 
 
-
-  LaunchUtil.init({
   
+        LaunchUtil.init({
             LoginActivity.isLogin}, { ac, login ->
             LoginFragHelper.login(ac) {
                 login.isLogin(it)
@@ -43,4 +42,43 @@ implementation 'com.github.jccppp:launchac:0.0.3'
             }
         });
         
+        使用如下
+        launchActivity<OneActivity>()  //启动OneActivity不带参数
+        
+         launchActivity<OneActivity> {  //启动OneActivity带参数
+                it["canShu"] = "hello1"
+            }
+         接收
+         <img width="395" alt="截屏2022-06-09 23 24 12" src="https://user-images.githubusercontent.com/28549918/172884471-0573aadb-1db9-4219-a19e-5ac24a71b0e2.png">
+        等价于
+        <img width="377" alt="image" src="https://user-images.githubusercontent.com/28549918/172884623-f29369bc-2884-4ea2-8005-a1259b2c64d4.png">
+        
+        使用startActivityForResult
+        
+        首先
+        <img width="691" alt="image" src="https://user-images.githubusercontent.com/28549918/172885880-56bc5ed7-6a17-494d-b3a3-0894520c4ca8.png">
+        IAcCallBack by AcCallBackHelper()
+        
+        并在onCreate时候调用 initAcCallBackHelper
+        
+        MainActivity 启动
+        launchActivityForResult<OneActivity>(acBack = object : StartForResult {
+                override fun result(code: Int, data: Intent?) {
+                    if (code == RESULT_OK) Toast.makeText(
+                        this@MainActivity,
+                        "OneActivity页面传值${data?.getStringExtra("data")}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+            })
+            OneActivity 像MainActivity 返回值
+           findViewById<View>(R.id.view).setOnClickListener {
+            setResult(RESULT_OK, Intent().also { it["data"]="哈哈啊哈" })
+            finish()}
+            
+            登录判断请查看demo
+            
+            
+         
         
