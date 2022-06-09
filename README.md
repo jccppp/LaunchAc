@@ -4,13 +4,9 @@ implementation 'com.github.jccppp:launchac:0.0.3'
 
 开始使用
 
-首先初始化下
-
-
+1.0:首先初始化下
 <img width="446" alt="image" src="https://user-images.githubusercontent.com/28549918/172647110-8d5354f6-283e-4f04-bbfa-47c939606826.png">
 
-
-  
         LaunchUtil.init({
             LoginActivity.isLogin}, { ac, login ->
             LoginFragHelper.login(ac) {
@@ -42,21 +38,26 @@ implementation 'com.github.jccppp:launchac:0.0.3'
             }
         });
         
-        使用如下
+2.0:使用如下
         launchActivity<OneActivity>()  //启动OneActivity不带参数
         
          launchActivity<OneActivity> {  //启动OneActivity带参数
                 it["canShu"] = "hello1"
             }
-         接收
-         <img width="395" alt="截屏2022-06-09 23 24 12" src="https://user-images.githubusercontent.com/28549918/172884471-0573aadb-1db9-4219-a19e-5ac24a71b0e2.png">
-        等价于
-        <img width="377" alt="image" src="https://user-images.githubusercontent.com/28549918/172884623-f29369bc-2884-4ea2-8005-a1259b2c64d4.png">
+  
+接收       
+<img width="395" alt="截屏2022-06-09 23 24 12" src="https://user-images.githubusercontent.com/28549918/172887718-7b02bc53-8b8a-47e5-aa47-0e6ed10f1f6c.png">
+
+等价于
+       
+<img width="355" alt="image" src="https://user-images.githubusercontent.com/28549918/172887883-2d5873ae-2841-4035-aa61-9249d0362024.png">
+
         
-        使用startActivityForResult
-        
-        首先
-        <img width="691" alt="image" src="https://user-images.githubusercontent.com/28549918/172885880-56bc5ed7-6a17-494d-b3a3-0894520c4ca8.png">
+3.0:使用startActivityForResult
+首先
+       
+<img width="669" alt="image" src="https://user-images.githubusercontent.com/28549918/172888018-25d23ae6-9e9e-4bb5-b45e-5be0f6c511a5.png">
+       
         IAcCallBack by AcCallBackHelper()
         
         并在onCreate时候调用 initAcCallBackHelper
@@ -77,7 +78,7 @@ implementation 'com.github.jccppp:launchac:0.0.3'
             setResult(RESULT_OK, Intent().also { it["data"]="哈哈啊哈" })
             finish()}
             
-            登录判断请查看demo
+4.0:登录判断请查看demo
             
             
          
