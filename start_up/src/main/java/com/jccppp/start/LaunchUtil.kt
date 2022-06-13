@@ -21,7 +21,7 @@ object LaunchUtil {
     }
 
     fun getIsLogin(): Boolean {
-        if (isLogin == null) RuntimeException("请调用 LaunchUtil.isLogin ")
+        if (isLogin == null) return true
         return isLogin!!.invoke()
     }
 

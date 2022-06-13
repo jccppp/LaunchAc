@@ -8,14 +8,14 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        LaunchUtil.init({
+       /* LaunchUtil.init({
             LoginActivity.isLogin
         }, { ac, login ->
             LoginFragHelper.login(ac) {
                 login.isLogin(it)
 
             }
-        })
+        })*/
 
     }
 }

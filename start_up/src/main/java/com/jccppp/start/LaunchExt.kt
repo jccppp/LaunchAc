@@ -1,5 +1,6 @@
 package com.jccppp.start
 
+import android.app.Activity
 import android.content.Intent
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -160,6 +161,27 @@ inline fun <reified AC : FragmentActivity> Fragment.launchActivity(
 ) {
     activity?.launchActivity<AC>(intent)
 }
+
+fun Activity.setBack(
+    resultCode: Int = Activity.RESULT_OK,
+    finish: Boolean = true,
+    intent: ((Intent) -> Unit)? = null
+) {
+    setResult(resultCode, Intent().also {
+        intent?.invoke(it)
+    })
+
+    if (finish) finish()
+}
+
+fun Fragment.setBack(
+    resultCode: Int = Activity.RESULT_OK,
+    finish: Boolean = true,
+    intent: ((Intent) -> Unit)? = null
+) {
+    requireActivity().setBack(resultCode = resultCode, finish, intent)
+}
+
 
 
 
