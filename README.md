@@ -1,10 +1,10 @@
 请添加 maven { url 'https://jitpack.io' }
 
-implementation 'com.github.jccppp:launchac:0.0.5'
+implementation 'com.github.jccppp:launchac:0.0.6'
 
 开始使用
 
-1.0:首先初始化下
+     1.0:首先初始化下(如果不适用登录判断可以不初始化)
 <img width="446" alt="image" src="https://user-images.githubusercontent.com/28549918/172647110-8d5354f6-283e-4f04-bbfa-47c939606826.png">
 
         LaunchUtil.init({
