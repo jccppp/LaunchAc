@@ -5,11 +5,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.jccppp.start.AcCallBackHelper
+import com.jccppp.start.*
 import com.jccppp.start.jk.IAcCallBack
 import com.jccppp.start.jk.StartForResult
-import com.jccppp.start.launchActivity
-import com.jccppp.start.launchActivityForResult
 
 class LoginFragHelper : Fragment(), IAcCallBack by AcCallBackHelper() {
 
@@ -44,13 +42,12 @@ class LoginFragHelper : Fragment(), IAcCallBack by AcCallBackHelper() {
     }
 
     fun goLogo() {
-        launchActivityForResult<LoginActivity>(object : StartForResult {
-            override fun result(code: Int, data: Intent?) {
-                call?.invoke(code == AppCompatActivity.RESULT_OK)
-                parentFragmentManager.beginTransaction().remove(this@LoginFragHelper)
-                    .commitAllowingStateLoss()
-            }
-        })
+
+        launchAcForResult<LoginActivity> { code, data ->
+            call?.invoke(code == AppCompatActivity.RESULT_OK)
+            parentFragmentManager.beginTransaction().remove(this@LoginFragHelper)
+                .commitAllowingStateLoss()
+        }
     }
 
 }

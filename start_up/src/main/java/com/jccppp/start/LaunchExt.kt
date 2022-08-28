@@ -1,6 +1,7 @@
 package com.jccppp.start
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -11,66 +12,68 @@ import com.jccppp.start.jk.StartForResult
 
 
 /**
- *   如果未登录需要登录, next it =true 已登录的后续操作  it =false  未登录的后续操作
+ *   如果未登录需要登录, next it = true 已登录的后续操作  it = false  未登录的后续操作
  * */
-inline fun <reified AC : FragmentActivity> FragmentActivity.launchActivityWithLogin(
+inline fun <reified AC : FragmentActivity> FragmentActivity.launchAcWithLogin(
+    vararg parameter: Pair<String, Any?>,
     noinline next: ((Boolean) -> Unit)? = null,  //后续操作
-    noinline intent: ((Intent) -> Unit)? = null,
 ) {
 
-    val jump: ConditionalJumpLogin? = if (next == null) null else object : ConditionalJumpLogin {
-        override fun jump(isLogin: Boolean): Boolean {
-            next.invoke(isLogin)
-            return true
-        }
+    val jump: ConditionalJumpLogin? = if (next == null) null else ConditionalJumpLogin { isLogin ->
+        next.invoke(isLogin)
+        true
     }
 
-    launchActivityWithLoginForBack<AC>(jump, intent)
+    launchAcWithLoginAndJump<AC>(parameter = parameter, jump)
 }
 
 /**
- *   如果未登录需要登录, next it =true 已登录的后续操作  it =false  未登录的后续操作  多了ForResult
+ *   如果未登录需要登录, next it =true 已登录的后续操作  it = false  未登录的后续操作  多了ForResult
  * */
 
-inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivityWithLoginForResult(
-    acBack: StartForResult,
+inline fun <reified AC : FragmentActivity> IAcCallBack.launchAcWithLoginForResult(
+    vararg parameter: Pair<String, Any?>,
     noinline next: ((Boolean) -> Unit)? = null,  //后续操作
-    noinline intent: ((Intent) -> Unit)? = null,
+    acBack: StartForResult,
 ) {
 
-    val jump: ConditionalJumpLogin? = if (next == null) null else object : ConditionalJumpLogin {
-        override fun jump(isLogin: Boolean): Boolean {
-            next.invoke(isLogin)
-            return true
-        }
+    val jump: ConditionalJumpLogin? = if (next == null) null else ConditionalJumpLogin { isLogin ->
+        next.invoke(isLogin)
+        true
     }
     getResultDeque().offerFirst(acBack)
 
     getAcCallContext()?.insideStartUpActivityWithLoginForResult<AC>(
-        this, jump, intent
+        this, jump, parameter = parameter
     )
 }
 
 
 /**
- *   如果未登录需要登录, jump ConditionalJumpLogin return false 已登录也不做跳转
+ *   如果未登录需要登录, jump ConditionalJumpLogin return true 跳转目标Ac return false 已登录也不做跳转
+ *   带登录条件和其他条件的跳转  两者皆满足才会跳转 ,例如登录之后 用户不是VIP,但目标Ac为VIP才可跳转
  * */
-inline fun <reified AC : FragmentActivity> FragmentActivity.launchActivityWithLoginForBack(
-    jump: ConditionalJumpLogin? = null,  //后续操作,true 为登录成功，false为登录失败
-    noinline intent: ((Intent) -> Unit)? = null,
+inline fun <reified AC : FragmentActivity> FragmentActivity.launchAcWithLoginAndJump(
+    vararg parameter: Pair<String, Any?>,
+    jump: ConditionalJumpLogin?,  //后续操作,true 为登录成功，false为登录失败
 ) {
 
-    insideStartUpActivityWithLoginForResult<AC>(null, jump, intent)
+    insideStartUpActivityWithLoginForResult<AC>(null, jump, parameter = parameter)
 
 }
 
-inline fun <reified AC : FragmentActivity> Fragment.launchActivityWithLoginForBack(
-    jump: ConditionalJumpLogin? = null,  //后续操作,true 为登录成功，false为登录失败
-    noinline intent: ((Intent) -> Unit)? = null,
+inline fun <reified AC : FragmentActivity> Fragment.launchAcWithLoginAndJump(
+    vararg parameter: Pair<String, Any?>,
+    jump: ConditionalJumpLogin? //后续操作,true 为登录成功，false为登录失败
 ) {
+    activity?.launchAcWithLoginAndJump<AC>(parameter = parameter, jump)
+}
 
-    activity?.launchActivityWithLoginForBack<AC>(jump, intent)
-
+inline fun <reified AC : FragmentActivity> Context.launchAcWithLoginAndJump(
+    vararg parameter: Pair<String, Any?>,
+    jump: ConditionalJumpLogin? //后续操作,true 为登录成功，false为登录失败
+) {
+    (this as? FragmentActivity)?.launchAcWithLoginAndJump<AC>(parameter = parameter, jump)
 }
 
 
@@ -78,15 +81,15 @@ inline fun <reified AC : FragmentActivity> Fragment.launchActivityWithLoginForBa
 inline fun <reified AC : FragmentActivity> FragmentActivity.insideStartUpActivityWithLoginForResult(
     acb: IAcCallBack? = null,
     jump: ConditionalJumpLogin? = null,  //后续操作,true 为登录成功，false为登录失败
-    noinline intent: ((Intent) -> Unit)? = null,
+    vararg parameter: Pair<String, Any?>,
 ) {
 
     if (LaunchUtil.getIsLogin()) {
         if (jump?.jump(true) != false) {
             if (acb == null) {
-                launchActivity<AC>(intent)
+                launchAc<AC>(parameter = parameter)
             } else {
-                acb._launchActivity<AC>(intent = intent)
+                acb._launchAc<AC>(parameter = parameter)
             }
         }
 
@@ -96,9 +99,9 @@ inline fun <reified AC : FragmentActivity> FragmentActivity.insideStartUpActivit
                 if (login) {
                     if (jump?.jump(login) != false) {
                         if (acb == null) {
-                            launchActivity<AC>(intent)
+                            launchAc<AC>(parameter = parameter)
                         } else {
-                            acb._launchActivity<AC>(intent = intent)
+                            acb._launchAc<AC>(parameter = parameter)
                         }
                     }
                 }
@@ -108,79 +111,110 @@ inline fun <reified AC : FragmentActivity> FragmentActivity.insideStartUpActivit
 }
 
 
-inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivityWithLoginForResultBack(
+inline fun <reified AC : FragmentActivity> IAcCallBack.launchAcWithLoginForResultAndJump(
+    vararg parameter: Pair<String, Any?>,
     acBack: StartForResult,
-    jump: ConditionalJumpLogin? = null,  //后续操作,true 为登录成功，false为登录失败
-    noinline intent: ((Intent) -> Unit)? = null,
+    jump: ConditionalJumpLogin?  //后续操作,true 为登录成功，false为登录失败
 ) {
     getResultDeque().offerFirst(acBack)
     getAcCallContext()?.insideStartUpActivityWithLoginForResult<AC>(
-        this, jump = jump, intent = intent
+        this, jump = jump, parameter = parameter
     )
 }
 
-inline fun <reified AC : FragmentActivity> Fragment.launchActivityWithLogin(
+inline fun <reified AC : FragmentActivity> Fragment.launchAcWithLogin(
+    vararg parameter: Pair<String, Any?>,
     noinline next: ((Boolean) -> Unit)? = null,  //后续操作,true 为登录成功，false为登录失败
-    noinline intent: ((Intent) -> Unit)? = null,
 ) {
-    activity?.launchActivityWithLogin<AC>(next, intent)
+    activity?.launchAcWithLogin<AC>(parameter = parameter, next)
+}
+
+inline fun <reified AC : FragmentActivity> Context?.launchAcWithLogin(
+    vararg parameter: Pair<String, Any?>,
+    noinline next: ((Boolean) -> Unit)? = null,  //后续操作,true 为登录成功，false为登录失败
+) {
+    (this as? FragmentActivity)?.launchAcWithLogin<AC>(parameter = parameter, next)
 }
 
 
-inline fun <reified AC : FragmentActivity> FragmentActivity.launchActivity(
-    noinline intent: ((Intent) -> Unit)? = null
+inline fun <reified AC : FragmentActivity> FragmentActivity.launchAc(
+    vararg parameter: Pair<String, Any?>,
 ) {
     startActivity(Intent(this, AC::class.java).also {
-        intent?.invoke(it)
+        it.add(*parameter)
     })
 }
 
-inline fun <reified AC : FragmentActivity> IAcCallBack._launchActivity(
-    noinline intent: ((Intent) -> Unit)? = null
+
+inline fun <reified AC : FragmentActivity> IAcCallBack._launchAc(
+    vararg parameter: Pair<String, Any?>,
 ) {
     getAcCallContext()?.let { it ->
         getResultLauncher().launch(Intent(it, AC::class.java).also {
-            intent?.invoke(it)
+            it.add(*parameter)
         })
     }
-
 }
 
 
-inline fun <reified AC : FragmentActivity> IAcCallBack.launchActivityForResult(
-    acBack: StartForResult,
-    noinline intent: ((Intent) -> Unit)? = null
+inline fun <reified AC : FragmentActivity> IAcCallBack.launchAcForResult(
+    vararg parameter: Pair<String, Any?>,
+    acBack: StartForResult
 ) {
     getResultDeque().offerFirst(acBack)
-    _launchActivity<AC>(intent = intent)
+    _launchAc<AC>(parameter = parameter)
 
 }
 
-inline fun <reified AC : FragmentActivity> Fragment.launchActivity(
-    noinline intent: ((Intent) -> Unit)? = null
+inline fun <reified AC : FragmentActivity> Fragment.launchAc(
+    vararg parameter: Pair<String, Any?>
 ) {
-    activity?.launchActivity<AC>(intent)
+    activity?.launchAc<AC>(parameter = parameter)
+}
+
+inline fun <reified AC : FragmentActivity> Context?.launchAc(
+    vararg parameter: Pair<String, Any?>
+) {
+    (this as? FragmentActivity)?.launchAc<AC>(parameter = parameter)
 }
 
 fun Activity.setBack(
+    vararg parameter: Pair<String, Any?>,
     resultCode: Int = Activity.RESULT_OK,
     finish: Boolean = true,
-    intent: ((Intent) -> Unit)? = null
 ) {
     setResult(resultCode, Intent().also {
-        intent?.invoke(it)
+        it.add(*parameter)
     })
 
     if (finish) finish()
 }
 
+fun Intent.add(vararg parameter: Pair<String, Any?>) = apply {
+    parameter.forEach {
+        this[it.first] = it.second
+    }
+}
+
+
 fun Fragment.setBack(
+    vararg parameter: Pair<String, Any?>,
     resultCode: Int = Activity.RESULT_OK,
     finish: Boolean = true,
-    intent: ((Intent) -> Unit)? = null
 ) {
-    requireActivity().setBack(resultCode = resultCode, finish, intent)
+    requireActivity().setBack(*parameter, resultCode = resultCode, finish = finish)
 }
+
+fun Context?.setBack(
+    vararg parameter: Pair<String, Any?>,
+    resultCode: Int = Activity.RESULT_OK,
+    finish: Boolean = true,
+) {
+    (this as? FragmentActivity)?.setBack(*parameter, resultCode = resultCode, finish = finish)
+}
+
+
+
 
 
 

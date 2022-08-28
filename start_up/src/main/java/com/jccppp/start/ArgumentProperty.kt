@@ -40,7 +40,7 @@ class FragmentArgumentProperty<T>(
     var value: T? = null
 
     override fun getValue(thisRef: Fragment, property: KProperty<*>): T {
-        return value ?: thisRef.arguments?.getValue(setKey ?: property.name) as? T
+        return value ?: thisRef.arguments?.getValue<T>(setKey ?: property.name).also { value = it }
         ?: defaultValue
         ?: throw IllegalStateException("Property ${property.name} could not be read")
     }
@@ -53,14 +53,10 @@ class FragmentArgumentProperty<T>(
 class FragmentArgumentPropertyNullable<T>(private val setKey: String?) :
     ReadWriteProperty<Fragment, T?> {
 
-
     var value: T? = null
 
     override fun getValue(thisRef: Fragment, property: KProperty<*>): T? {
-        if (value != null) return value
-        val value1 = thisRef.arguments?.getValue<T>(setKey ?: property.name)
-        value = value1
-        return value
+        return value ?: thisRef.arguments?.getValue<T>(setKey ?: property.name).also { value = it }
     }
 
     override fun setValue(thisRef: Fragment, property: KProperty<*>, value: T?) {
@@ -78,8 +74,9 @@ class ActivityArgumentProperty<T>(private val defaultValue: T?, private val setK
     var value: T? = null
 
     override fun getValue(thisRef: Activity, property: KProperty<*>): T {
-        return value ?: thisRef.intent?.extras?.getValue(setKey ?: property.name) as? T
-        ?: defaultValue
+        return value ?: (thisRef.intent?.extras?.getValue(setKey ?: property.name) as? T).also {
+            value = it
+        } ?: defaultValue
         ?: throw IllegalStateException("Property ${property.name} could not be read")
     }
 
@@ -94,13 +91,13 @@ class ActivityArgumentDelegateNullable<T>(private val setKey: String?) :
     var value: T? = null
 
     override fun getValue(thisRef: Activity, property: KProperty<*>): T? {
-        if (value != null) return value
-        val value1 = thisRef.intent?.extras?.getValue<T>(setKey ?: property.name)
-        value = value1
-        return value
+        return value ?: thisRef.intent?.extras?.getValue<T>(setKey ?: property.name).also {
+            value = it
+        }
     }
 
     override fun setValue(thisRef: Activity, property: KProperty<*>, value: T?) {
+        "" to 1
         this.value = value
     }
 }
@@ -138,12 +135,12 @@ operator fun <T> Bundle.set(key: String, value: T?) {
 
 fun <T> Bundle.getValue(key: String): T? {
     @Suppress("UNCHECKED_CAST")
-    return get(key) as T?
+    return get(key) as? T?
 }
 
 operator fun <T> Intent.set(key: String, value: T) {
     when (value) {
-        is Boolean -> putExtra(key, value)
+        is Boolean? -> putExtra(key, value)
         is Byte -> putExtra(key, value)
         is Char -> putExtra(key, value)
         is Short -> putExtra(key, value)

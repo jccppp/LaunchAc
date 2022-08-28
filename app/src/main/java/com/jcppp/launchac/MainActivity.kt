@@ -1,14 +1,11 @@
 package com.jcppp.launchac
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.jccppp.start.*
-import com.jccppp.start.jk.ConditionalJumpLogin
 import com.jccppp.start.jk.IAcCallBack
-import com.jccppp.start.jk.StartForResult
 
 class MainActivity : AppCompatActivity(), IAcCallBack by AcCallBackHelper() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,42 +15,30 @@ class MainActivity : AppCompatActivity(), IAcCallBack by AcCallBackHelper() {
         initAcCallBackHelper()
 
         findViewById<View>(R.id.tv1).setOnClickListener {
-            launchActivity<OneActivity>()
+            launchAc<OneActivity>()
         }
 
         findViewById<View>(R.id.tv2).setOnClickListener {
-            launchActivity<OneActivity> {
-                it["canShu"] = "hello1"
-            }
+            launchAc<OneActivity>("canShu" to "hello1" , "custom" to "hello3")
         }
         findViewById<View>(R.id.tv3).setOnClickListener {
-            launchActivityWithLogin<OneActivity>()
+            launchAcWithLogin<OneActivity>()
         }
         var index = 1
         findViewById<View>(R.id.tv4).setOnClickListener {
-            launchActivityWithLoginForBack<OneActivity>(
-                jump = object : ConditionalJumpLogin {
-                    override fun jump(isLogin: Boolean): Boolean {
-                        return isLogin && index++ % 2 == 0
-                    }
-                }
-            ) {
-                it["canShu"] = "hello2"
-            }
-
+            launchAcWithLoginAndJump<OneActivity>("canShu" to "hello2",
+                jump = { isLogin -> isLogin && index++ % 2 == 0 }
+            )
         }
         findViewById<View>(R.id.tv5).setOnClickListener {
 
-            launchActivityForResult<OneActivity>(acBack = object : StartForResult {
-                override fun result(code: Int, data: Intent?) {
-                    if (code == RESULT_OK) Toast.makeText(
-                        this@MainActivity,
-                        "OneActivity页面传值${data?.getStringExtra("data")}",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-
-            })
+            launchAcForResult<OneActivity> { code, data ->
+                if (code == RESULT_OK) Toast.makeText(
+                    this@MainActivity,
+                    "OneActivity页面传值${data?.getStringExtra("data")}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
     }
 }
