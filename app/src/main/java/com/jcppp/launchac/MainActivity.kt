@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.jccppp.start.*
+import com.jccppp.start.config.LaunchAcConfig
 import com.jccppp.start.jk.IAcCallBack
 
 class MainActivity : AppCompatActivity(), IAcCallBack by AcCallBackHelper() {
@@ -18,27 +19,41 @@ class MainActivity : AppCompatActivity(), IAcCallBack by AcCallBackHelper() {
             launchAc<OneActivity>()
         }
 
+
         findViewById<View>(R.id.tv2).setOnClickListener {
-            launchAc<OneActivity>("canShu" to "hello1" , "custom" to "hello3")
+            launchAc<OneActivity>("canShu" to "hello1", "custom" to "hello3")
         }
         findViewById<View>(R.id.tv3).setOnClickListener {
-            launchAcWithLogin<OneActivity>()
+            launchAc<OneActivity>() {
+                withLogin()
+            }
         }
         var index = 1
+
         findViewById<View>(R.id.tv4).setOnClickListener {
-            launchAcWithLoginAndJump<OneActivity>("canShu" to "hello2",
-                jump = { isLogin -> isLogin && index++ % 2 == 0 }
-            )
+            launchAc<OneActivity>("canShu" to "hello2") {
+                condition { isLogin ->
+                    val jump = index++ % 2 == 0
+                    if (!jump) Toast.makeText(this@MainActivity, "条件不符合跳转", Toast.LENGTH_LONG)
+                        .show()
+                    jump
+                }
+
+            }
+
         }
         findViewById<View>(R.id.tv5).setOnClickListener {
 
-            launchAcForResult<OneActivity> { code, data ->
-                if (code == RESULT_OK) Toast.makeText(
-                    this@MainActivity,
-                    "OneActivity页面传值${data?.getStringExtra("data")}",
-                    Toast.LENGTH_LONG
-                ).show()
+            launchAc<OneActivity>() {
+                result { code, data ->
+                    if (code == RESULT_OK) Toast.makeText(
+                        this@MainActivity,
+                        "OneActivity页面传值${data?.getStringExtra("data")}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
+
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.jccppp.start
 
 import androidx.fragment.app.FragmentActivity
+import com.jccppp.start.config.LaunchAcConfig
 import com.jccppp.start.jk.IOnLoginNext
 
 /**
@@ -10,15 +11,31 @@ import com.jccppp.start.jk.IOnLoginNext
  */
 object LaunchUtil {
 
+    private var config: LaunchAcConfig? = null
     private var isLogin: (() -> Boolean)? = null
     private var startLogin: ((FragmentActivity, IOnLoginNext) -> Unit)? = null
 
     @JvmStatic
-    fun init(isLogin: () -> Boolean, startLogin: (FragmentActivity, IOnLoginNext) -> Unit) {
+    fun init(
+        isLogin: () -> Boolean,
+        startLogin: (FragmentActivity, IOnLoginNext) -> Unit
+    ) {
+        init(null, isLogin, startLogin)
+    }
+
+    @JvmStatic
+    fun init(
+        config: LaunchAcConfig?,
+        isLogin: () -> Boolean,
+        startLogin: (FragmentActivity, IOnLoginNext) -> Unit
+    ) {
+        this.config = config
         this.isLogin = isLogin
         this.startLogin = startLogin
 
     }
+
+    fun getConfig() = config
 
     fun getIsLogin(): Boolean {
         if (isLogin == null) return true
