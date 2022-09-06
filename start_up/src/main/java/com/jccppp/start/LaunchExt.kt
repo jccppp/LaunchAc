@@ -6,8 +6,7 @@ import android.content.Intent
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.jccppp.start.config.LaunchAcConfig
-import com.jccppp.start.jk.IAcCallBack
-import com.jccppp.start.jk.IOnLoginNext
+import com.jccppp.start.jk.*
 
 
 inline fun <reified AC : FragmentActivity> FragmentActivity.launchAc(
@@ -66,17 +65,25 @@ inline fun <reified AC : FragmentActivity> Context.launchAc(
 fun insideStartUpActivityWithLoginForResult(
     javaClass: Class<*>,
     any: Any,
-    config: LaunchAcConfig?,
+    mConfig: LaunchAcConfig?,
     vararg parameter: Pair<String, Any?>,
 ) {
 
-    val mConfig: LaunchAcConfig? = config ?: LaunchUtil.getConfig()
+    val globalConfig = LaunchUtil.getConfig()
 
-    val withLogin = mConfig?.withLogin
+    val copy = (mConfig?.copyGlobal ?: globalConfig?.copyGlobal) == true
+
+    val withLogin = mConfig?.withLogin ?: if (copy) globalConfig?.withLogin else null
 
     val isLogin = LaunchUtil.getIsLogin()
 
-    val stop = mConfig?.condition?.jump(isLogin) == false
+    val stop = (mConfig?.condition ?: if (copy) globalConfig?.condition else null)?.jump(
+        isLogin
+    ) == false
+
+    val intent = mConfig?.intent ?: if (copy) globalConfig?.intent else null
+
+    val result = mConfig?.result ?: if (copy) globalConfig?.result else null
 
     if (stop) {
         return
@@ -84,7 +91,7 @@ fun insideStartUpActivityWithLoginForResult(
 
     if (withLogin == true) {
         if (isLogin) {
-            _jump(any, javaClass, config, parameter = parameter)
+            _jump(any, javaClass, intent, result, parameter = parameter)
         } else {
             val ac: FragmentActivity =
                 if (any is FragmentActivity) {
@@ -97,13 +104,13 @@ fun insideStartUpActivityWithLoginForResult(
 
             LaunchUtil.getStartLogin(ac, object : IOnLoginNext {
                 override fun isLogin(login: Boolean) {
-                    _jump(any, javaClass, config, parameter = parameter)
+                    _jump(any, javaClass, intent, result, parameter = parameter)
                 }
             })
         }
 
     } else {
-        _jump(any, javaClass, config, parameter = parameter)
+        _jump(any, javaClass, intent, result, parameter = parameter)
     }
 
 
@@ -112,58 +119,60 @@ fun insideStartUpActivityWithLoginForResult(
 private fun _jump(
     any: Any,
     javaClass: Class<*>,
-    config: LaunchAcConfig?,
+    intent: IAcBaseCallBack<Intent>?,
+    result: StartForResult?,
     vararg parameter: Pair<String, Any?>
 ) {
     if (any is IAcCallBack) {
-        any._jump(javaClass, config, parameter = parameter)
+        any._jump(javaClass, intent, result, parameter = parameter)
     } else if (any is Fragment) {
-        any._jump(javaClass, config, parameter = parameter)
+        any._jump(javaClass, intent, parameter = parameter)
     } else if (any is FragmentActivity) {
-        any._jump(javaClass, config, parameter = parameter)
+        any._jump(javaClass, intent, parameter = parameter)
     }
 
 }
 
 private fun Fragment._jump(
     javaClass: Class<*>,
-    config: LaunchAcConfig?,
+    intent: IAcBaseCallBack<Intent>?,
     vararg parameter: Pair<String, Any?>,
 ) {
 
-    requireActivity()._jump(javaClass, config, parameter = parameter)
+    requireActivity()._jump(javaClass, intent, parameter = parameter)
 
 }
 
 private fun FragmentActivity._jump(
     javaClass: Class<*>,
-    config: LaunchAcConfig?,
+    intent: IAcBaseCallBack<Intent>?,
     vararg parameter: Pair<String, Any?>,
 ) {
 
-    startActivity(Intent(this, javaClass).also { intent ->
-        intent.add(*parameter)
-        config?.intent?.invoke(intent)
+    startActivity(Intent(this, javaClass).also { i ->
+        i.add(*parameter)
+        intent?.invoke(i)
     })
 }
 
 private fun IAcCallBack._jump(
     javaClass: Class<*>,
-    config: LaunchAcConfig?,
+    intent: IAcBaseCallBack<Intent>?,
+    result: StartForResult?,
     vararg parameter: Pair<String, Any?>,
 ) {
 
-    if (config?.result != null) {
-        getResultDeque().offerFirst(config.result)
+    if (result != null) {
+        getResultDeque().offerFirst(result)
         getAcCallContext()?.let {
-            getResultLauncher().launch(Intent(it, javaClass).also { intent ->
-                intent.add(*parameter)
-                config.intent?.invoke(intent)
+            getResultLauncher().launch(Intent(it, javaClass).also { i ->
+                i.add(*parameter)
+                intent?.invoke(i)
             })
         }
     } else {
         getAcCallContext()?.let {
-            it._jump(javaClass, config, parameter = parameter)
+            it._jump(javaClass, intent, parameter = parameter)
         }
     }
 }

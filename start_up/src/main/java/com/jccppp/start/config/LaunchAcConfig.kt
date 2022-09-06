@@ -1,7 +1,6 @@
 package com.jccppp.start.config
 
 import android.content.Intent
-import android.view.View
 import com.jccppp.start.jk.ConditionalJumpLogin
 import com.jccppp.start.jk.IAcBaseCallBack
 import com.jccppp.start.jk.StartForResult
@@ -11,9 +10,11 @@ class LaunchAcConfig private constructor(
     val result: StartForResult?,
     val condition: ConditionalJumpLogin?,
     val intent: IAcBaseCallBack<Intent>?,
+    val copyGlobal: Boolean,
 ) {
 
     companion object {
+        @JvmStatic
         fun create(init: (Builder.() -> Unit)? = null): LaunchAcConfig {
             val builder = Builder()
             if (init != null)
@@ -27,6 +28,7 @@ class LaunchAcConfig private constructor(
         builder.result,
         builder.condition,
         builder.intent,
+        builder.copyGlobal,
     )
 
     class Builder {
@@ -37,6 +39,8 @@ class LaunchAcConfig private constructor(
         var condition: ((Boolean) -> Boolean)? = null
             private set
         var intent: ((Intent) -> Unit)? = null
+            private set
+        var copyGlobal: Boolean = false
             private set
 
 
@@ -55,6 +59,11 @@ class LaunchAcConfig private constructor(
         fun intent(intent: (intent:Intent)->Unit) = apply {
             this.intent = intent
         }
+
+        fun copyGlobal(copyGlobal: Boolean ) = apply {
+            this.copyGlobal = copyGlobal
+        }
+
 
         fun build(): LaunchAcConfig {
 

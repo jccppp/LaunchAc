@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.jccppp.start.*
-import com.jccppp.start.config.LaunchAcConfig
 import com.jccppp.start.jk.IAcCallBack
 
 class MainActivity : AppCompatActivity(), IAcCallBack by AcCallBackHelper() {
@@ -16,12 +15,16 @@ class MainActivity : AppCompatActivity(), IAcCallBack by AcCallBackHelper() {
         initAcCallBackHelper()
 
         findViewById<View>(R.id.tv1).setOnClickListener {
-            launchAc<OneActivity>()
+            launchAc<OneActivity>(){
+                copyGlobal(false)
+            }
         }
 
 
         findViewById<View>(R.id.tv2).setOnClickListener {
-            launchAc<OneActivity>("canShu" to "hello1", "custom" to "hello3")
+            launchAc<OneActivity>("canShu" to "hello1", "custom" to "hello3"){
+                copyGlobal(true)
+            }
         }
         findViewById<View>(R.id.tv3).setOnClickListener {
             launchAc<OneActivity>() {

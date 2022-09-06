@@ -1,10 +1,12 @@
 package com.jcppp.launchac;
 
 import android.app.Application;
+import android.content.Intent;
 
 import androidx.fragment.app.FragmentActivity;
 
 import com.jccppp.start.LaunchUtil;
+import com.jccppp.start.config.LaunchAcConfig;
 import com.jccppp.start.jk.IOnLoginNext;
 
 import kotlin.Unit;
@@ -18,7 +20,25 @@ public class MyApplication2 extends Application {
     public void onCreate() {
         super.onCreate();
 
-        LaunchUtil.init(new Function0<Boolean>() {
+        LaunchUtil.init(LaunchAcConfig.Companion.create(new Function1<LaunchAcConfig.Builder, Unit>() {
+            @Override
+            public Unit invoke(LaunchAcConfig.Builder builder) {
+                builder.copyGlobal(true).intent(new Function1<Intent, Unit>() {
+                    @Override
+                    public Unit invoke(Intent intent) {
+                        intent.putExtra("canShu","11111");
+                        return null;
+                    }
+                }).result(new Function2<Integer, Intent, Unit>() {
+                    @Override
+                    public Unit invoke(Integer integer, Intent intent) {
+                        return null;
+                    }
+                });
+
+                return null;
+            }
+        }), new Function0<Boolean>() {
             @Override
             public Boolean invoke() {
                 return LoginActivity.Companion.isLogin();
