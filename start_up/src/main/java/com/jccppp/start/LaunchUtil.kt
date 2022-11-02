@@ -26,8 +26,8 @@ object LaunchUtil {
     @JvmStatic
     fun init(
         config: LaunchAcConfig?,
-        isLogin: () -> Boolean,
-        startLogin: (FragmentActivity, IOnLoginNext) -> Unit
+        isLogin: () -> Boolean, //是否登录
+        startLogin: (FragmentActivity, IOnLoginNext) -> Unit  //未登录唤起登录
     ) {
         this.config = config
         this.isLogin = isLogin
@@ -43,7 +43,6 @@ object LaunchUtil {
     }
 
     fun getStartLogin(ac: FragmentActivity, next: IOnLoginNext) {
-        if (startLogin == null) RuntimeException("请调用 LaunchUtil.isLogin ")
-        startLogin!!.invoke(ac, next)
+        startLogin?.invoke(ac, next)
     }
 }

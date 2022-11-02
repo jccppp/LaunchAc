@@ -102,11 +102,15 @@ fun insideStartUpActivityWithLoginForResult(
                     any.getAcCallContext()!!
                 } else throw RuntimeException("")
 
-            LaunchUtil.getStartLogin(ac, object : IOnLoginNext {
-                override fun isLogin(login: Boolean) {
-                    _jump(any, javaClass, intent, result, parameter = parameter)
-                }
-            })
+            LaunchUtil.getStartLogin(ac) {
+                _jump(
+                    any,
+                    javaClass,
+                    intent,
+                    result,
+                    parameter = parameter
+                )
+            }
         }
 
     } else {

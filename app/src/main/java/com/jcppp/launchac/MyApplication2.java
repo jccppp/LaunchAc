@@ -49,7 +49,7 @@ public class MyApplication2 extends Application {
                 LoginFragHelper.Companion.login(fragmentActivity, new Function1<Boolean, Unit>() {
                     @Override
                     public Unit invoke(Boolean aBoolean) {
-                        iOnLoginNext.isLogin(aBoolean);
+                        iOnLoginNext.isLogin();
                         return null;
                     }
                 });
