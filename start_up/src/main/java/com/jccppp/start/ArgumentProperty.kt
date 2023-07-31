@@ -23,14 +23,6 @@ fun <T> Activity.argument(defaultValue: T? = null, setKey: String? = null) =
     ActivityArgumentProperty(defaultValue, setKey)
 
 
-//设置bundle
-inline fun <T : Fragment> T.setBundle(block: (Bundle) -> Unit): T = apply {
-    arguments = Bundle().also {
-        block.invoke(it)
-    }
-}
-
-
 class FragmentArgumentProperty<T>(
     private val defaultValue: T? = null,
     private val setKey: String?
@@ -106,14 +98,14 @@ class ActivityArgumentDelegateNullable<T>(private val setKey: String?) :
 
 operator fun <T> Bundle.set(key: String, value: T?) {
     when (value) {
-        is Boolean -> putBoolean(key, value)
-        is Byte -> putByte(key, value)
-        is Char -> putChar(key, value)
-        is Short -> putShort(key, value)
-        is Int -> putInt(key, value)
-        is Long -> putLong(key, value)
-        is Float -> putFloat(key, value)
-        is Double -> putDouble(key, value)
+        is Boolean? -> putBoolean(key, value ?: false)
+        is Byte? -> putByte(key, value ?: 0.toByte())
+        is Char? -> putChar(key, value ?: 0.toChar())
+        is Short? -> putShort(key, value ?: 0.toShort())
+        is Int? -> putInt(key, value ?: 0)
+        is Long? -> putLong(key, value ?: 0L)
+        is Float? -> putFloat(key, value ?: 0F)
+        is Double? -> putDouble(key, value ?: 0.0)
         is String? -> putString(key, value)
         is CharSequence? -> putCharSequence(key, value)
         is Serializable? -> putSerializable(key, value) // also ArrayList
@@ -138,16 +130,16 @@ fun <T> Bundle.getValue(key: String): T? {
     return get(key) as? T?
 }
 
-operator fun <T> Intent.set(key: String, value: T) {
+operator fun <T> Intent.set(key: String, value: T?) {
     when (value) {
         is Boolean? -> putExtra(key, value)
-        is Byte -> putExtra(key, value)
-        is Char -> putExtra(key, value)
-        is Short -> putExtra(key, value)
-        is Int -> putExtra(key, value)
-        is Long -> putExtra(key, value)
-        is Float -> putExtra(key, value)
-        is Double -> putExtra(key, value)
+        is Byte? -> putExtra(key, value)
+        is Char? -> putExtra(key, value)
+        is Short? -> putExtra(key, value)
+        is Int? -> putExtra(key, value)
+        is Long? -> putExtra(key, value)
+        is Float? -> putExtra(key, value)
+        is Double? -> putExtra(key, value)
         is String? -> putExtra(key, value)
         is CharSequence? -> putExtra(key, value)
         is Serializable? -> putExtra(key, value)

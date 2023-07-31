@@ -3,6 +3,7 @@ package com.jccppp.start
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.jccppp.start.config.LaunchAcConfig
@@ -178,6 +179,19 @@ private fun IAcCallBack._jump(
         getAcCallContext()?.let {
             it._jump(javaClass, intent, parameter = parameter)
         }
+    }
+}
+
+//设置bundle
+fun <T : Fragment> T.setBundle(
+    vararg parameter: Pair<String, Any?>,
+    control: ((Bundle) -> Unit)? = null
+): T = apply {
+    arguments = Bundle().apply {
+        parameter.forEach {
+            this[it.first] = it.second
+        }
+        control?.invoke(this)
     }
 }
 
