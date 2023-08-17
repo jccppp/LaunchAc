@@ -44,7 +44,7 @@ inline fun <reified AC : FragmentActivity> Fragment.launchAc(
 
 }
 
-inline fun <reified AC : FragmentActivity> Context.launchAc(
+inline fun <reified AC : Activity> Context.launchAc(
     vararg parameter: Pair<String, Any?>,
     noinline builder: (LaunchAcConfig.Builder.() -> Unit)? = null
 ) {
@@ -134,6 +134,8 @@ private fun _jump(
         any._jump(javaClass, intent, parameter = parameter)
     } else if (any is FragmentActivity) {
         any._jump(javaClass, intent, parameter = parameter)
+    } else if (any is Activity) {
+        any._jump(javaClass, intent, parameter = parameter)
     }
 
 }
@@ -148,7 +150,7 @@ private fun Fragment._jump(
 
 }
 
-private fun FragmentActivity._jump(
+private fun Activity._jump(
     javaClass: Class<*>,
     intent: IAcBaseCallBack<Intent>?,
     vararg parameter: Pair<String, Any?>,

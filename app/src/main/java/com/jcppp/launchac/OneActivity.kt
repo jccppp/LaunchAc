@@ -1,14 +1,16 @@
 package com.jcppp.launchac
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.jccppp.start.argument
 import com.jccppp.start.argumentNullable
+import com.jccppp.start.launchAc
 import com.jccppp.start.setBack
 
-class OneActivity : AppCompatActivity() {
+class OneActivity : Activity() {
 
     private var canShu by argumentNullable<String>()  //可空
     // private var canShu by argument("")             // 不为空,如未传值则取默认值
@@ -28,6 +30,7 @@ class OneActivity : AppCompatActivity() {
         findViewById<View>(R.id.view).setOnClickListener {
             setBack("data" to "哈哈啊哈")
         }
+
 
         //可以二次赋值
         canShu = ""
