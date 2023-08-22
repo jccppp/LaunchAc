@@ -9,7 +9,7 @@
 ```
 
 ```
-   implementation 'com.github.jccppp:launchac:1.2.0'
+   implementation 'com.github.jccppp:launchac:1.4.0'
 ```
 
 
