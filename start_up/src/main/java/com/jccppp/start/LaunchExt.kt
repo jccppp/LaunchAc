@@ -94,16 +94,16 @@ fun insideStartUpActivityWithLoginForResult(
         if (isLogin) {
             _jump(any, javaClass, intent, result, parameter = parameter)
         } else {
-            val ac: FragmentActivity =
+            val ac: FragmentActivity? =
                 if (any is FragmentActivity) {
                     any
                 } else if (any is Fragment) {
                     any.requireActivity()
                 } else if (any is IAcCallBack) {
                     any.getAcCallContext()!!
-                } else throw RuntimeException("")
+                } else null
 
-            LaunchUtil.getStartLogin(ac) {
+            val onNext = IOnLoginNext {
                 _jump(
                     any,
                     javaClass,
@@ -112,6 +112,13 @@ fun insideStartUpActivityWithLoginForResult(
                     parameter = parameter
                 )
             }
+
+            if (ac != null) {
+                LaunchUtil.getStartLogin(ac, onNext)
+            } else {
+                onNext.isLogin()
+            }
+
         }
 
     } else {
@@ -136,6 +143,8 @@ private fun _jump(
         any._jump(javaClass, intent, parameter = parameter)
     } else if (any is Activity) {
         any._jump(javaClass, intent, parameter = parameter)
+    } else if (any is Context) {
+        any._jump1(javaClass, intent, parameter = parameter)
     }
 
 }
@@ -148,6 +157,18 @@ private fun Fragment._jump(
 
     requireActivity()._jump(javaClass, intent, parameter = parameter)
 
+}
+
+private fun Context._jump1(
+    javaClass: Class<*>,
+    intent: IAcBaseCallBack<Intent>?,
+    vararg parameter: Pair<String, Any?>,
+) {
+    startActivity(Intent(this, javaClass).also { i ->
+        i.add(*parameter)
+        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        intent?.invoke(i)
+    })
 }
 
 private fun Activity._jump(

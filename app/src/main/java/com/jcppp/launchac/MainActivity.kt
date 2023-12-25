@@ -15,7 +15,8 @@ class MainActivity : AppCompatActivity(), IAcCallBack by AcCallBackHelper() {
         initAcCallBackHelper()
 
         findViewById<View>(R.id.tv1).setOnClickListener {
-            launchAc<OneActivity>(){
+
+            applicationContext.launchAc<OneActivity>(){
                 copyGlobal(false)
             }
         }
