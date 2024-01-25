@@ -1,5 +1,7 @@
 package com.jccppp.start
 
+import android.app.Activity
+import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import com.jccppp.start.config.LaunchAcConfig
 import com.jccppp.start.jk.IOnLoginNext
@@ -13,12 +15,12 @@ object LaunchUtil {
 
     private var config: LaunchAcConfig? = null
     private var isLogin: (() -> Boolean)? = null
-    private var startLogin: ((FragmentActivity, IOnLoginNext) -> Unit)? = null
+    private var startLogin: ((Context, IOnLoginNext) -> Unit)? = null
 
     @JvmStatic
     fun init(
         isLogin: () -> Boolean,
-        startLogin: (FragmentActivity, IOnLoginNext) -> Unit
+        startLogin: (Context, IOnLoginNext) -> Unit
     ) {
         init(null, isLogin, startLogin)
     }
@@ -27,7 +29,7 @@ object LaunchUtil {
     fun init(
         config: LaunchAcConfig?,
         isLogin: () -> Boolean, //是否登录
-        startLogin: (FragmentActivity, IOnLoginNext) -> Unit  //未登录唤起登录
+        startLogin: (Context, IOnLoginNext) -> Unit  //未登录唤起登录
     ) {
         this.config = config
         this.isLogin = isLogin
@@ -42,7 +44,7 @@ object LaunchUtil {
         return isLogin!!.invoke()
     }
 
-    fun getStartLogin(ac: FragmentActivity, next: IOnLoginNext) {
+    fun getStartLogin(ac: Context, next: IOnLoginNext) {
         startLogin?.invoke(ac, next)
     }
 }

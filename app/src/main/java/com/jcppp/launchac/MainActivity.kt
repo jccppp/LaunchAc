@@ -4,10 +4,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import com.jccppp.start.*
 import com.jccppp.start.jk.IAcCallBack
 
-class MainActivity : AppCompatActivity(), IAcCallBack by AcCallBackHelper() {
+class MainActivity : FragmentActivity(), IAcCallBack by AcCallBackHelper() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -15,15 +16,18 @@ class MainActivity : AppCompatActivity(), IAcCallBack by AcCallBackHelper() {
         initAcCallBackHelper()
 
         findViewById<View>(R.id.tv1).setOnClickListener {
+            launchAc<OneActivity>()
+        }
 
-            applicationContext.launchAc<OneActivity>(){
-                copyGlobal(false)
+        findViewById<View>(R.id.tv6).setOnClickListener {
+            applicationContext.launchAc<OneActivity> {
+                copyGlobal(true)
             }
         }
 
 
         findViewById<View>(R.id.tv2).setOnClickListener {
-            launchAc<OneActivity>("canShu" to "hello1", "custom" to "hello3"){
+            launchAc<OneActivity>("canShu" to "hello1", "custom" to "hello3") {
                 copyGlobal(true)
             }
         }
@@ -38,7 +42,11 @@ class MainActivity : AppCompatActivity(), IAcCallBack by AcCallBackHelper() {
             launchAc<OneActivity>("canShu" to "hello2") {
                 condition { isLogin ->
                     val jump = index++ % 2 == 0
-                    if (!jump) Toast.makeText(this@MainActivity, "条件不符合跳转", Toast.LENGTH_LONG)
+                    if (!jump) Toast.makeText(
+                        this@MainActivity,
+                        "条件不符合跳转",
+                        Toast.LENGTH_LONG
+                    )
                         .show()
                     jump
                 }

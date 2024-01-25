@@ -1,6 +1,8 @@
 package com.jcppp.launchac;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.fragment.app.FragmentActivity;
@@ -20,7 +22,7 @@ public class MyApplication2 extends Application {
     public void onCreate() {
         super.onCreate();
 
-        LaunchUtil.init(LaunchAcConfig.Companion.create(new Function1<LaunchAcConfig.Builder, Unit>() {
+        LaunchUtil.init(LaunchAcConfig.create(new Function1<LaunchAcConfig.Builder, Unit>() {
             @Override
             public Unit invoke(LaunchAcConfig.Builder builder) {
                 builder.copyGlobal(true).intent(new Function1<Intent, Unit>() {
@@ -43,9 +45,9 @@ public class MyApplication2 extends Application {
             public Boolean invoke() {
                 return LoginActivity.Companion.isLogin();
             }
-        }, new Function2<FragmentActivity, IOnLoginNext, Unit>() {
+        }, new Function2<Context, IOnLoginNext, Unit>() {
             @Override
-            public Unit invoke(FragmentActivity fragmentActivity, IOnLoginNext iOnLoginNext) {
+            public Unit invoke(Context fragmentActivity, IOnLoginNext iOnLoginNext) {
                 LoginFragHelper.Companion.login(fragmentActivity, new Function1<Boolean, Unit>() {
                     @Override
                     public Unit invoke(Boolean aBoolean) {

@@ -1,8 +1,9 @@
 package com.jccppp.start.jk
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import java.util.concurrent.LinkedBlockingDeque
 
@@ -19,6 +20,6 @@ interface IAcCallBack {
 
     fun <Host : LifecycleOwner> Host.initAcCallBackHelper()
 
-    fun getAcCallContext(): FragmentActivity?
+    fun getAcCallContext(): Context?
 
 }

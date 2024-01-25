@@ -1,5 +1,7 @@
 package com.jcppp.launchac
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -14,18 +16,19 @@ class LoginFragHelper : Fragment(), IAcCallBack by AcCallBackHelper() {
 
         private val TAG = "LoginFragHelper"
 
-        fun login(activity: FragmentActivity, call: ((Boolean) -> Unit)) {
-            val supportFragmentManager = activity.supportFragmentManager
+        fun login(activity: Context, call: ((Boolean) -> Unit)) {
+            if (activity is FragmentActivity) {
+                val supportFragmentManager = activity.supportFragmentManager
+                val findFragment = supportFragmentManager.findFragmentByTag(TAG)
 
-            val findFragment = supportFragmentManager.findFragmentByTag(TAG)
-
-            if (findFragment is LoginFragHelper) {
-                findFragment.call = call
-                findFragment.goLogo()
-            } else {
-                supportFragmentManager.beginTransaction()
-                    .add(LoginFragHelper().also { it.call = call }, TAG)
-                    .commitAllowingStateLoss()
+                if (findFragment is LoginFragHelper) {
+                    findFragment.call = call
+                    findFragment.goLogo()
+                } else {
+                    supportFragmentManager.beginTransaction()
+                        .add(LoginFragHelper().also { it.call = call }, TAG)
+                        .commitAllowingStateLoss()
+                }
             }
         }
 

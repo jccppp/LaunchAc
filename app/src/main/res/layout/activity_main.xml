@@ -26,6 +26,18 @@
         android:background="#e0e0e0" />
 
     <TextView
+        android:id="@+id/tv6"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:gravity="center"
+        android:text="ApplicationContext跳转" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e0e0e0" />
+
+    <TextView
         android:id="@+id/tv2"
         android:layout_width="match_parent"
         android:layout_height="80dp"

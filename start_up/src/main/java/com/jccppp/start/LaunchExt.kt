@@ -1,16 +1,19 @@
 package com.jccppp.start
 
 import android.app.Activity
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import com.jccppp.start.config.LaunchAcConfig
-import com.jccppp.start.jk.*
+import com.jccppp.start.jk.IAcBaseCallBack
+import com.jccppp.start.jk.IAcCallBack
+import com.jccppp.start.jk.IOnLoginNext
+import com.jccppp.start.jk.StartForResult
 
 
-inline fun <reified AC : FragmentActivity> FragmentActivity.launchAc(
+inline fun <reified AC : Activity> Activity.launchAc(
     vararg parameter: Pair<String, Any?>,
     noinline builder: (LaunchAcConfig.Builder.() -> Unit)? = null
 ) {
@@ -27,7 +30,7 @@ inline fun <reified AC : FragmentActivity> FragmentActivity.launchAc(
 }
 
 
-inline fun <reified AC : FragmentActivity> Fragment.launchAc(
+inline fun <reified AC : Activity> Fragment.launchAc(
     vararg parameter: Pair<String, Any?>,
     noinline builder: (LaunchAcConfig.Builder.() -> Unit)? = null
 ) {
@@ -62,6 +65,7 @@ inline fun <reified AC : Activity> Context.launchAc(
 }
 
 
+
 //外部就不要调佣这个了,除非没有符合条件的
 fun insideStartUpActivityWithLoginForResult(
     javaClass: Class<*>,
@@ -94,13 +98,15 @@ fun insideStartUpActivityWithLoginForResult(
         if (isLogin) {
             _jump(any, javaClass, intent, result, parameter = parameter)
         } else {
-            val ac: FragmentActivity? =
-                if (any is FragmentActivity) {
+            val ac: Context? =
+                if (any is Activity) {
                     any
                 } else if (any is Fragment) {
                     any.requireActivity()
                 } else if (any is IAcCallBack) {
                     any.getAcCallContext()!!
+                } else if (any is Context) {
+                    any
                 } else null
 
             val onNext = IOnLoginNext {
@@ -139,12 +145,10 @@ private fun _jump(
         any._jump(javaClass, intent, result, parameter = parameter)
     } else if (any is Fragment) {
         any._jump(javaClass, intent, parameter = parameter)
-    } else if (any is FragmentActivity) {
-        any._jump(javaClass, intent, parameter = parameter)
     } else if (any is Activity) {
         any._jump(javaClass, intent, parameter = parameter)
     } else if (any is Context) {
-        any._jump1(javaClass, intent, parameter = parameter)
+        any._jump(javaClass, intent, parameter = parameter)
     }
 
 }
@@ -159,14 +163,16 @@ private fun Fragment._jump(
 
 }
 
-private fun Context._jump1(
+private fun Context._jump(
     javaClass: Class<*>,
     intent: IAcBaseCallBack<Intent>?,
     vararg parameter: Pair<String, Any?>,
 ) {
     startActivity(Intent(this, javaClass).also { i ->
         i.add(*parameter)
-        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        if (this is Application) {
+            i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
         intent?.invoke(i)
     })
 }
@@ -250,6 +256,6 @@ fun Context?.setBack(
     resultCode: Int = Activity.RESULT_OK,
     finish: Boolean = true,
 ) {
-    (this as? FragmentActivity)?.setBack(*parameter, resultCode = resultCode, finish = finish)
+    (this as? Activity)?.setBack(*parameter, resultCode = resultCode, finish = finish)
 }
 
