@@ -97,32 +97,33 @@ class ActivityArgumentDelegateNullable<T>(private val setKey: String?) :
 // --------------------------------------------------------------------------------------
 
 operator fun <T> Bundle.set(key: String, value: T?) {
-    when (value) {
-        is Boolean? -> putBoolean(key, value ?: false)
-        is Byte? -> putByte(key, value ?: 0.toByte())
-        is Char? -> putChar(key, value ?: 0.toChar())
-        is Short? -> putShort(key, value ?: 0.toShort())
-        is Int? -> putInt(key, value ?: 0)
-        is Long? -> putLong(key, value ?: 0L)
-        is Float? -> putFloat(key, value ?: 0F)
-        is Double? -> putDouble(key, value ?: 0.0)
-        is String? -> putString(key, value)
-        is CharSequence? -> putCharSequence(key, value)
-        is Serializable? -> putSerializable(key, value) // also ArrayList
-        is Parcelable? -> putParcelable(key, value)
-        is Bundle? -> putBundle(key, value)
-        is BooleanArray? -> putBooleanArray(key, value)
-        is ByteArray? -> putByteArray(key, value)
-        is CharArray? -> putCharArray(key, value)
-        is ShortArray? -> putShortArray(key, value)
-        is IntArray? -> putIntArray(key, value)
-        is LongArray? -> putLongArray(key, value)
-        is FloatArray? -> putFloatArray(key, value)
-        is DoubleArray? -> putDoubleArray(key, value)
-        is ArrayList<*>? -> throw IllegalStateException("ArrayList<*> $key is not supported")
-        is Array<*>? -> throw IllegalStateException("Array<*> $key is not supported")
-        else -> throw IllegalStateException("Type $key is not supported")
-    }
+    if (value != null)
+        when (value) {
+            is Boolean -> putBoolean(key, value)
+            is Byte -> putByte(key, value)
+            is Char -> putChar(key, value)
+            is Short -> putShort(key, value)
+            is Int -> putInt(key, value)
+            is Long -> putLong(key, value)
+            is Float -> putFloat(key, value)
+            is Double -> putDouble(key, value)
+            is String -> putString(key, value)
+            is CharSequence -> putCharSequence(key, value)
+            is Serializable -> putSerializable(key, value) // also ArrayList
+            is Parcelable -> putParcelable(key, value)
+            is Bundle -> putBundle(key, value)
+            is BooleanArray -> putBooleanArray(key, value)
+            is ByteArray -> putByteArray(key, value)
+            is CharArray -> putCharArray(key, value)
+            is ShortArray -> putShortArray(key, value)
+            is IntArray -> putIntArray(key, value)
+            is LongArray -> putLongArray(key, value)
+            is FloatArray -> putFloatArray(key, value)
+            is DoubleArray -> putDoubleArray(key, value)
+            is ArrayList<*> -> throw IllegalStateException("ArrayList<*> $key is not supported")
+            is Array<*> -> throw IllegalStateException("Array<*> $key is not supported")
+            else -> throw IllegalStateException("Type $key is not supported")
+        }
 }
 
 fun <T> Bundle.getValue(key: String): T? {

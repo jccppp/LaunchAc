@@ -145,8 +145,6 @@ private fun _jump(
         any._jump(javaClass, intent, result, parameter = parameter)
     } else if (any is Fragment) {
         any._jump(javaClass, intent, parameter = parameter)
-    } else if (any is Activity) {
-        any._jump(javaClass, intent, parameter = parameter)
     } else if (any is Context) {
         any._jump(javaClass, intent, parameter = parameter)
     }
@@ -169,25 +167,14 @@ private fun Context._jump(
     vararg parameter: Pair<String, Any?>,
 ) {
     startActivity(Intent(this, javaClass).also { i ->
+        intent?.invoke(i)
         i.add(*parameter)
         if (this is Application) {
             i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
-        intent?.invoke(i)
     })
 }
 
-private fun Activity._jump(
-    javaClass: Class<*>,
-    intent: IAcBaseCallBack<Intent>?,
-    vararg parameter: Pair<String, Any?>,
-) {
-
-    startActivity(Intent(this, javaClass).also { i ->
-        i.add(*parameter)
-        intent?.invoke(i)
-    })
-}
 
 private fun IAcCallBack._jump(
     javaClass: Class<*>,
@@ -200,8 +187,8 @@ private fun IAcCallBack._jump(
         getResultDeque().offerFirst(result)
         getAcCallContext()?.let {
             getResultLauncher().launch(Intent(it, javaClass).also { i ->
-                i.add(*parameter)
                 intent?.invoke(i)
+                i.add(*parameter)
             })
         }
     } else {
